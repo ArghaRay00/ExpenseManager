@@ -50,6 +50,7 @@
                 <td>@Html.DisplayFor(modelItem => item.Category)</td>
                 <td>
                     <button class="btn btn-default" onclick="AddEditExpenses(@item.ItemId)">Edit</button>
+
                     <button class="btn btn-danger" onclick="DeleteExpense(@item.ItemId)">Delete</button>
                 </td>
             </tr>
@@ -107,21 +108,25 @@
         });
     }
 
-    let DeleteExpense = (itemId) => {
-        let ans = confirm("Do you want to delete item with Item Id:" + itemId);
+    var DeleteExpense = function (itemId) {
+
+        var ans = confirm("Do you want to delete item with Item Id: " + itemId);
+
         if (ans) {
             $.ajax({
                 type: "POST",
-                url: "/Expense/Delete" + itemId,
-                success: () => {
+                url: "/Expense/Delete/" + '?' + $.param({ "itemId": itemId }),
+                contentType: "application/json",
+                async: "true",
+                success: function () {
                     window.location.href = "/Expense/Index";
                 }
             })
         }
     }
 
-  
-    
+
+
 </script>
 
 <script>

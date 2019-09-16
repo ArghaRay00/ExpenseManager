@@ -1,10 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ExpenseManager.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 
-namespace ExpenseManager.Models
+namespace ExpenseManager.Persistence.Contexts
 {
     public class ExpenseDBContext : DbContext
     {
+        public ExpenseDBContext(DbContextOptions<ExpenseDBContext> options) : base(options)
+        {
+        }
         public virtual DbSet<ExpenseReport> ExpenseReport { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

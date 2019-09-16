@@ -1,76 +1,76 @@
-﻿
-
-// For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
-using ExpenseManager.Models;
+﻿using ExpenseManager.Models;
+using ExpenseManager.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace ExpenseManager.Controllers
 {
     public class ExpenseController : Controller
     {
-        ExpensesDataAccessLayer expenseManager = new ExpensesDataAccessLayer();
-        // GET: /<controller>/
-        public IActionResult Index(string searchString)
-        {
-            List<ExpenseReport> reports = new List<ExpenseReport>();
+        private readonly IExpenseService _expenseService;
 
-            reports = expenseManager.GetAllExpenses().ToList();
+        public ExpenseController(IExpenseService expenseService)
+        {
+            _expenseService = expenseService;
+        }
+        // GET: /<controller>/
+        public async Task<IActionResult> Index(string searchString)
+        {
+            var expenseData = await _expenseService.GetAllExpenses();
             if (!string.IsNullOrEmpty(searchString))
             {
-                reports = expenseManager.GetSearchResult(searchString).ToList();
+                expenseData = await _expenseService.GetSearchResult(searchString);
             }
-            return View(reports);
+            return View(expenseData);
         }
-        public ActionResult AddEditExpenses(int itemId)
+        public async Task<IActionResult> AddEditExpenses(int itemId)
         {
             ExpenseReport model = new ExpenseReport();
             if (itemId > 0)
             {
-                model = expenseManager.GetExpenseData(itemId);
+                model = await _expenseService.GetExpenseData(itemId);
             }
             return PartialView("_expenseForm", model);
         }
 
         [HttpPost]
-        public ActionResult Create(ExpenseReport newExpense)
+        public async Task<IActionResult> Create(ExpenseReport newExpense)
         {
             if (ModelState.IsValid)
             {
                 if (newExpense.ItemId > 0)
                 {
-                    expenseManager.UpdateExpense(newExpense);
+                    await _expenseService.UpdateExpense(newExpense);
                 }
                 else
                 {
-                    expenseManager.AddExpense(newExpense);
+                    await _expenseService.AddExpense(newExpense);
                 }
             }
             return RedirectToAction("Index");
         }
 
-        [HttpPost]
-        public IActionResult Delete(int id)
+      [HttpPost]
+        public async Task<IActionResult> Delete(int itemId)
         {
-            expenseManager.DeleteExpense(id);
+            await _expenseService.DeleteExpense(itemId);
             return RedirectToAction("Index");
         }
 
-        public ActionResult ExpenseSummary()
+        public IActionResult ExpenseSummary()
         {
             return PartialView("_expenseReport");
         }
 
         public JsonResult GetWeeklyExpense()
         {
-            Dictionary<string, decimal> weeklyExpense = expenseManager.CalculateWeeklyExpense();
+            var weeklyExpense = _expenseService.CalculateWeeklyExpense();
             return new JsonResult(weeklyExpense);
         }
         public JsonResult GetMonthlyExpense()
         {
-            Dictionary<string, decimal> monthlyExpense = expenseManager.CalculateWeeklyExpense();
+            var monthlyExpense = _expenseService.CalculateMonthlyExpense();
             return new JsonResult(monthlyExpense);
         }
     }

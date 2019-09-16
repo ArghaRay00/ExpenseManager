@@ -2,11 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ExpenseManager.Persistence.Contexts;
+using ExpenseManager.Persistence.Repositories;
+using ExpenseManager.Repositories;
+using ExpenseManager.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -33,6 +38,12 @@ namespace ExpenseManager
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddDbContext<ExpenseDBContext>(options =>
+            {
+                options.UseSqlServer("Data Source=(localdb)\\mssqllocaldb;Initial Catalog=ExpenseManager;Integrated Security=True");
+            });
+            services.AddScoped<IExpenseService, ExpenseService>();
+            services.AddScoped<IExpenseRepository, ExpenseRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
