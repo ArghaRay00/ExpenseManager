@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ExpenseManager.Extensions;
 using ExpenseManager.Persistence.Contexts;
 using ExpenseManager.Persistence.Repositories;
 using ExpenseManager.Repositories;
@@ -58,7 +59,7 @@ namespace ExpenseManager
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-
+            app.UseAntiforgeryTokens();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
